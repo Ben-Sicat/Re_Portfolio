@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/*
+  Tokens: violet-tinted neutrals with a lavender accent. Dark is the default
+  look; light follows the system setting.
+  Shape rule: cards 20px, buttons full pill, diagram nodes 16px.
+*/
+:root {
+  --bg: #120f1c;
+  --surface: #1a1628;
+  --surface-2: #221d34;
+  --line: #312a48;
+  --fg: #eeebf7;
+  --muted: #a39db9;
+  --accent: #b8a1ff;
+  --accent-text: #c3b0ff;
+  --accent-ink: #170f2e;
+  --glow: 184 161 255;
+  --chart-hi: #9378ea;
+  --chart-lo: #6b6585;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f3fb;
+    --surface: #ece8f7;
+    --surface-2: #e2dcf2;
+    --line: #d0c8e6;
+    --fg: #17132a;
+    --muted: #595272;
+    --accent: #7553e0;
+    --accent-text: #5c3cc6;
+    --accent-ink: #ffffff;
+    --glow: 117 83 224;
+    --chart-hi: #7553e0;
+    --chart-lo: #857e9e;
+    color-scheme: light;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-ink: var(--accent-ink);
+  --font-sans: var(--font-geist);
+  --font-display: var(--font-bricolage);
+}
+
+html {
+  background: var(--bg);
+}
+
+/* Entrance animations start off-screen; never let them cause sideways scroll. */
+html,
+body {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/*
+  Cursor light: a soft glow that sits under the content. It is a fixed-size
+  layer moved with transform, so following the mouse never repaints the page.
+*/
+.spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1240px;
+  height: 1240px;
+  margin: -620px 0 0 -620px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+  background:
+    radial-gradient(circle at center, rgb(var(--glow) / 0.14) 0, transparent 180px),
+    radial-gradient(circle at center, rgb(var(--glow) / 0.07) 0, transparent 620px);
+}
+.spotlight[data-on="true"] {
+  opacity: 1;
+}
+
+/* Edge darkening over the 3D scene, done in CSS instead of a render pass. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.35) 100%);
+}
+@media (prefers-color-scheme: light) {
+  .vignette {
+    background: radial-gradient(ellipse at center, transparent 60%, rgb(60 40 120 / 0.08) 100%);
+  }
+}
+
+/* Card border that lights up near the cursor. */
+.glow-card {
+  position: relative;
+  isolation: isolate;
+}
+.glow-card::before,
+.glow-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--glow-o, 0);
+  transition: opacity 0.3s ease;
+}
+.glow-card::before {
+  padding: 1px;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(var(--glow) / 0.85),
+    transparent 60%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+.glow-card::after {
+  z-index: -1;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(var(--glow) / 0.08),
+    transparent 60%
+  );
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgb(var(--glow) / 0.22) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
